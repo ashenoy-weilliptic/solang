@@ -42,6 +42,8 @@ use solang_parser::pt;
 #[cfg(feature = "soroban")]
 use super::soroban;
 
+use super::weilliptic;
+
 static LLVM_INIT: OnceCell<()> = OnceCell::new();
 
 #[macro_export]
@@ -183,6 +185,9 @@ impl<'a> Binary<'a> {
                 polkadot::PolkadotTarget::build(context, &std_lib, contract, ns, opt)
             }
             Target::Solana => solana::SolanaTarget::build(context, &std_lib, contract, ns, opt),
+            Target::Weilliptic => {
+                weilliptic::WeillipticTarget::build(context, &std_lib, contract, ns, opt)
+            },
             #[cfg(feature = "soroban")]
             Target::Soroban => {
                 soroban::SorobanTarget::build(context, &std_lib, contract, ns, opt, _contract_no)
