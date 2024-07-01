@@ -36,12 +36,12 @@ pub(super) fn process_instruction<'a, T: TargetRuntime<'a> + ?Sized>(
 ) {
     match ins {
         Instr::Nop => (),
-        Instr::Return { value } if value.is_empty() && ns.target != Target::Soroban => {
+        Instr::Return { value } if value.is_empty() && ns.target != Target::Soroban && ns.target != Target::Weilliptic => {
             bin.builder
                 .build_return(Some(&bin.return_values[&ReturnCode::Success]))
                 .unwrap();
         }
-        Instr::Return { value } if ns.target != Target::Soroban => {
+        Instr::Return { value } if ns.target != Target::Soroban && ns.target != Target::Weilliptic => {
             let returns_offset = cfg.params.len();
             for (i, val) in value.iter().enumerate() {
                 let arg = function.get_nth_param((returns_offset + i) as u32).unwrap();
@@ -462,7 +462,7 @@ pub(super) fn process_instruction<'a, T: TargetRuntime<'a> + ?Sized>(
                 .collect::<Vec<BasicMetadataValueEnum>>();
 
             // Soroban doesn't write return values to imported memory
-            if !res.is_empty() && ns.target != Target::Soroban {
+            if !res.is_empty() && ns.target != Target::Soroban && ns.target != Target::Weilliptic {
                 for v in f.returns.iter() {
                     parms.push(if ns.target == Target::Solana {
                         bin.build_alloca(function, bin.llvm_var_ty(&v.ty, ns), v.name_as_str())
@@ -488,7 +488,7 @@ pub(super) fn process_instruction<'a, T: TargetRuntime<'a> + ?Sized>(
                 .left();
 
             // Soroban doesn't have return codes, and only returns a single i64 value
-            if ns.target != Target::Soroban {
+            if ns.target != Target::Soroban && ns.target != Target::Weilliptic {
                 let success = bin
                     .builder
                     .build_int_compare(

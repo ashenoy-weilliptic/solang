@@ -17,8 +17,8 @@ use crate::emit::soroban::PUT_CONTRACT_DATA;
 pub fn link(input: &[u8], name: &str) -> Vec<u8> {
     let dir = tempdir().expect("failed to create temp directory for linking");
 
-    let object_filename = dir.path().join(format!("{name}.o"));
-    let res_filename = dir.path().join(format!("{name}.wasm"));
+    let object_filename = dir.path().join(format!("{name}-soroban.o"));
+    let res_filename = dir.path().join(format!("{name}-soroban.wasm"));
 
     let mut objectfile =
         File::create(object_filename.clone()).expect("failed to create object file");
