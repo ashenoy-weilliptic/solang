@@ -52,5 +52,7 @@ pub(super) fn new_event_emitter<'a>(
         }),
 
         Target::Soroban => todo!(),
+
+        Target::Weilliptic => todo!(),
     }
 }

@@ -42,6 +42,8 @@ use solang_parser::pt;
 #[cfg(feature = "soroban")]
 use super::soroban;
 
+use super::weilliptic;
+
 static LLVM_INIT: OnceCell<()> = OnceCell::new();
 
 #[macro_export]
@@ -183,6 +185,9 @@ impl<'a> Binary<'a> {
                 polkadot::PolkadotTarget::build(context, &std_lib, contract, ns, opt)
             }
             Target::Solana => solana::SolanaTarget::build(context, &std_lib, contract, ns, opt),
+            Target::Weilliptic => {
+                weilliptic::WeillipticTarget::build(context, &std_lib, contract, ns, opt, _contract_no)
+            },
             #[cfg(feature = "soroban")]
             Target::Soroban => {
                 soroban::SorobanTarget::build(context, &std_lib, contract, ns, opt, _contract_no)
@@ -786,7 +791,7 @@ impl<'a> Binary<'a> {
             .map(|ty| self.llvm_var_ty(ty, ns).into())
             .collect::<Vec<BasicMetadataTypeEnum>>();
 
-        if ns.target == Target::Soroban {
+        if ns.target == Target::Soroban || ns.target == Target::Weilliptic {
             match returns.iter().next() {
                 Some(ret) => return self.llvm_type(ret, ns).fn_type(&args, false),
                 None => return self.context.void_type().fn_type(&args, false),
@@ -1227,7 +1232,7 @@ impl<'a> Binary<'a> {
         ns: &Namespace,
         code: PanicCode,
     ) -> (PointerValue<'a>, IntValue<'a>) {
-        if ns.target == Target::Solana || ns.target == Target::Soroban {
+        if ns.target == Target::Solana || ns.target == Target::Soroban || ns.target == Target::Weilliptic {
             return (
                 self.context
                     .i8_type()
